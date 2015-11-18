@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Examus comments framework
 
 **Comments framework for django sites**
