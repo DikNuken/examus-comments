@@ -1,0 +1,12 @@
+{% load i18n %}
+<div id="comment_{{ comment.id }}" class="comment">
+    <div class="author">{{ comment.user }}</div>
+    <div class="text">{% if comment.deleted %}DELETED{% else %}{{ comment.text }}{% endif %}</div>
+    <div class="actions">
+        <a class="action" href="#" onclick="reply({{ comment.id }})">{% trans "reply" %}</a>
+        {% if comment.childrens %}
+            <a class="action" href="#{{ comment.thread_id }}"
+               onclick="expand({{ comment.id }},$('#comment_{{ comment.id }}'))">{% trans "expand" %}({{ comment.childrens }})</a>
+        {% endif %}
+    </div>
+</div>

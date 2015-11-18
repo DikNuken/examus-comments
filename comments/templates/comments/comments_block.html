@@ -1,0 +1,92 @@
+{% load i18n %}
+<div id="comments">
+    <h2>
+        {% trans "Comments" %}</h2>
+    <style scoped>
+        .comment {
+            width: auto;
+            margin: 1% 0 0 2%;
+            position: relative;
+            background: #f5f5f5;
+        }
+
+        a.action {
+            float: left;
+            margin: 0 1em 0 0;
+        }
+    </style>
+    <script>
+        function expand(comment_id, parent_block) {
+            $.getJSON("{% url "comments" comment_pk=0 %}".replace("0", comment_id), function (comments) {
+                parent_block.find('.comment').remove();
+                $(comments).each(function (i, el) {
+                    parent_block.append(el.html);
+                });
+            });
+        }
+        function send() {
+            var form = $('#comment_form');
+            $.post('{% url "comments" %}', form.serialize(), function (data) {
+                var reply_to = form.find('#reply_to').val();
+                $(reply_to ? '#comment_' + reply_to : '#comments_list').append(data.html);
+                form.find('#reply_to').val('');
+                form.find('#text').val('');
+                form.find('#reply_to_user').text('');
+            });
+
+        }
+
+        function reply(comment_id) {
+            var form = $('#comment_form');
+            form.find('#reply_to').val(comment_id);
+            form.find('#reply_to_user')
+                    .text('{% trans "Reply to" %}: '
+                            + $('#comment_' + comment_id).find('.author:first').text());
+            form.find('#reset_reply_to_button').show();
+        }
+        function reset_reply_to() {
+            var form = $('#comment_form');
+            form.find('#reply_to').val('');
+            form.find('#reply_to_user').text('');
+            form.find('#reset_reply_to_button').hide();
+
+        }
+    </script>
+
+    <div id="comment_list">
+        {% for comment in comments %}
+            {% include "comments/comment.html" %}
+        {% endfor %}
+    </div>
+    <br><br><br>
+
+    <div>
+        <h2>{% trans "Leave a comment" %}</h2>
+
+        <form id="comment_form">
+            {% csrf_token %}
+            <input type="hidden" name="page_url" value="{{ page_url }}">
+            <input type="hidden" name="reply_to" id='reply_to' value="">
+
+            <p>
+                <span id="reply_to_user"></span>
+                <button type="button" onclick="reset_reply_to()" id="reset_reply_to_button"
+                        style="display: none">{% trans "Reset" %}</button>
+            </p>
+            <p>
+                <label>
+                    {% trans "Text" %}
+                    <textarea id='text' name="text"></textarea>
+                </label><br>
+            </p>
+
+            <p>
+                <button type="button" onclick="send()">{% trans "Send" %}</button>
+            </p>
+
+        </form>
+    </div>
+</div>
+
+
+
